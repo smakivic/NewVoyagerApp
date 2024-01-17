@@ -21,12 +21,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import com.android.volley.AuthFailureError;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private RequestQueue requestQueue;
     private TextView osebe;
-    private String url = "http://localhost:5153/api/TripsApi";
+    private final String url = "https://newvoyager.azurewebsites.net/api/VoyagersApi";
+    public static final String EXTRA_MESSAGE = "com.example.newvoyagerapp.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +42,16 @@ public class MainActivity extends AppCompatActivity {
 
     public  void prikaziOsebe(View view){
         if (view != null){
-            JsonArrayRequest request = new JsonArrayRequest(url, jsonArrayListener, errorListener);
+            JsonArrayRequest request = new JsonArrayRequest(url, jsonArrayListener, errorListener)
+            {
+                @Override
+                public Map<String,String> getHeaders() throws AuthFailureError
+                {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("ApiKey", "MaliIstiMater");
+                    return params;
+                }
+            };
             requestQueue.add(request);
         }
     }
@@ -50,11 +63,9 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < response.length(); i++){
                 try {
                     JSONObject object =response.getJSONObject(i);
-                    String name = object.getString("firstMidName");
+                    String name = object.getString("firstName");
                     String surname = object.getString("lastName");
-                    String enrollmentDate = object.getString("enrollmentDate");
-
-                    data.add(name + " " + surname + " " + enrollmentDate);
+                    data.add(name + " " + surname);
 
                 } catch (JSONException e){
                     e.printStackTrace();
@@ -62,10 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             }
-
             osebe.setText("");
-
-
             for (String row: data){
                 String currentText = osebe.getText().toString();
                 osebe.setText(currentText + "\n\n" + row);
@@ -81,5 +89,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d("REST error", error.getMessage());
         }
     };
+
+    public void addStudentActivity (View view) {
+        Intent intent = new Intent(this,AddVoyagerActivity.class);
+        String message = "Dodaj osebo v seznam.";
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
 
 }
