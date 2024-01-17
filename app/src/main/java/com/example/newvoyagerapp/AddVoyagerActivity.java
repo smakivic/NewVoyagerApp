@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import com.android.volley.AuthFailureError;
